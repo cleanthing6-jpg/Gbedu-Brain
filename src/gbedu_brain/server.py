@@ -83,5 +83,28 @@ def root():
     })
 
 
+
+
+@app.route("/debug/analyze", methods=["POST"])
+def debug_analyze():
+    import traceback
+    f = request.files.get("vocal")
+    if not f:
+        return jsonify({"error": "no vocal"}), 400
+    tmp = UPLOADS / ("dbg_" + (f.filename or "x.wav"))
+    f.save(str(tmp))
+    try:
+        from gbedu_brain.analysis import analyze_vocal
+        result = analyze_vocal(str(tmp))
+        return jsonify({"ok": True, "result": result})
+    except Exception as e:
+        return jsonify({
+            "ok": False,
+            "error": str(e),
+            "type": type(e).__name__,
+            "trace": traceback.format_exc()[-2000:],
+        })
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=False)

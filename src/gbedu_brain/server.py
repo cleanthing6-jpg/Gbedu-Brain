@@ -106,5 +106,19 @@ def debug_analyze():
         })
 
 
+@app.route("/register-worker", methods=["POST"])
+def register_worker():
+    from gbedu_brain.ace_client import set_worker
+    d = request.get_json() or {}
+    u = (d.get("url") or "").rstrip("/")
+    if not u.startswith("http"): return jsonify({"error":"bad url"}), 400
+    set_worker(u)
+    return jsonify({"ok": True, "url": u})
+
+@app.route("/worker", methods=["GET"])
+def get_worker():
+    from gbedu_brain.ace_client import worker_url
+    return jsonify({"url": worker_url()})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=False)

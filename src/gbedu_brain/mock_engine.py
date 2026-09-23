@@ -51,7 +51,17 @@ def run_mock_production(job_id: str, vocal_path: str, genre: str, output_dir: Pa
 
         beat_path = Path(output_dir) / (job_id + ".wav")
         time.sleep(2.0)
-        shutil.copy(vocal_path, str(beat_path))
+        try:
+            from gbedu_brain.ace_client import generate_ace, worker_url
+            if worker_url():
+                audio = generate_ace(spec.bpm, spec.key, spec.scale, genre, duration=60)
+                beat_path.write_bytes(audio)
+                print(f"[ace] {len(audio)} bytes")
+            else:
+                shutil.copy(vocal_path, str(beat_path))
+        except Exception as e:
+            print(f"[ace] fail: {e}")
+            shutil.copy(vocal_path, str(beat_path))
         job_store.update(job_id, progress=0.9)
 
         job_store.complete(job_id, {

@@ -18,11 +18,11 @@ def analyze_vocal(path: str) -> dict:
     # Key
     key, scale, key_strength = es.KeyExtractor()(audio)
 
-    # Loudness / energy (EBU R128 integrated loudness as a proxy)
-    loudness = es.LoudnessEBUR128(sampleRate=44100)(audio)
-    lufs = float(loudness[1]) if loudness else -70.0
-    # map [-40, 0] LUFS to [0, 1] energy
-    energy = max(0.0, min(1.0, (lufs + 40.0) / 40.0))
+    # Loudness / energy (RMS-based, mono-safe)
+    rms = float((audio ** 2).mean()) ** 0.5
+    db = 20.0 * (rms ** 0.5 if rms > 0 else 0.0) if False else 20.0 * __import__("math").log10(rms) if rms > 0 else -80.0
+    # map [-60, 0] dBFS to [0, 1] energy
+    energy = max(0.0, min(1.0, (db + 60.0) / 60.0))
 
     return {
         "bpm": float(bpm),

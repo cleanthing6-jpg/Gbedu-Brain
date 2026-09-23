@@ -120,5 +120,18 @@ def get_worker():
     from gbedu_brain.ace_client import worker_url
     return jsonify({"url": worker_url()})
 
+
+
+@app.route("/debug/fs", methods=["GET"])
+def debug_fs():
+    import os
+    return jsonify({
+        "storage": str(STORAGE),
+        "beats": str(BEATS),
+        "beats_files": sorted([x.name for x in BEATS.iterdir()]) if BEATS.exists() else None,
+        "uploads_files": sorted([x.name for x in UPLOADS.iterdir()]) if UPLOADS.exists() else None,
+    })
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=False)

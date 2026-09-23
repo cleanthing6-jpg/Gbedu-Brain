@@ -16,7 +16,7 @@ UPLOADS.mkdir(parents=True, exist_ok=True)
 BEATS.mkdir(parents=True, exist_ok=True)
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 CORS(app)
 
 

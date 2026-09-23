@@ -7,16 +7,17 @@ from gbedu_brain.jobs import job_store
 
 
 def mock_analyze(vocal_path: str) -> VocalAnalysis:
-    time.sleep(0.5)
-    return VocalAnalysis(
-        bpm=105.0,
-        key="F",
-        scale="minor",
-        key_strength=0.82,
-        duration=30.0,
-        energy=0.74,
-        pitch_contour=[],
-    )
+    """Layer 2: real Essentia analysis. Falls back to a default if it fails."""
+    try:
+        from gbedu_brain.analysis import analyze_vocal
+        d = analyze_vocal(vocal_path)
+        return VocalAnalysis(**d)
+    except Exception as e:
+        print(f"[analysis] fallback: {e}")
+        return VocalAnalysis(
+            bpm=105.0, key="F", scale="minor", key_strength=0.0,
+            duration=0.0, energy=0.0, pitch_contour=[],
+        )
 
 
 def mock_songspec(analysis: VocalAnalysis, genre: str) -> SongSpec:

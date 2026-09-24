@@ -54,7 +54,8 @@ def run_mock_production(job_id: str, vocal_path: str, genre: str, output_dir: Pa
         try:
             from gbedu_brain.ace_client import generate_ace, worker_url
             if worker_url():
-                audio = generate_ace(spec.bpm, spec.key, spec.scale, genre, duration=60)
+                audio = generate_ace(spec.bpm, spec.key, spec.scale, genre,
+                                     duration=30, src_audio_path=vocal_path)
                 beat_path.write_bytes(audio)
                 print(f"[ace] {len(audio)} bytes")
             else:
